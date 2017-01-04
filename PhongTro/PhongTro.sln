@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhongTro.WebApi", "PhongTro.WebApi\PhongTro.WebApi.csproj", "{CF56F0DB-2D36-4945-BE42-2C45339CF4BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhongTro.Domain", "PhongTro.Domain\PhongTro.Domain.csproj", "{C9B0E75E-DAFE-4758-949D-92A3F3BF7BA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhongTro.Model", "PhongTro.Model\PhongTro.Model.csproj", "{3433FC17-94F8-4B1D-88BC-845D85CE4149}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CF56F0DB-2D36-4945-BE42-2C45339CF4BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF56F0DB-2D36-4945-BE42-2C45339CF4BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF56F0DB-2D36-4945-BE42-2C45339CF4BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF56F0DB-2D36-4945-BE42-2C45339CF4BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9B0E75E-DAFE-4758-949D-92A3F3BF7BA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9B0E75E-DAFE-4758-949D-92A3F3BF7BA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9B0E75E-DAFE-4758-949D-92A3F3BF7BA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9B0E75E-DAFE-4758-949D-92A3F3BF7BA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3433FC17-94F8-4B1D-88BC-845D85CE4149}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3433FC17-94F8-4B1D-88BC-845D85CE4149}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3433FC17-94F8-4B1D-88BC-845D85CE4149}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3433FC17-94F8-4B1D-88BC-845D85CE4149}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
