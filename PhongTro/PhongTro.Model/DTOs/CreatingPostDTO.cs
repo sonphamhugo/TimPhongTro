@@ -28,6 +28,9 @@ namespace PhongTro.Model.DTOs
         [MaxLength(500)]
         [Display(Name = "Description")]
         public string Description { get; set; }
+
+        [Display(Name = "Images")]
+        public string[] Images { get; set; }
         
         public string PhongTroUserID { get; set; }
     }

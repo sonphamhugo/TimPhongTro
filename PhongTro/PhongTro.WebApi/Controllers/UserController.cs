@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security.Cookies;
+using Newtonsoft.Json;
 using PhongTro.Domain.Entities;
 using PhongTro.Domain.Infracstucture;
 using PhongTro.Model;
@@ -11,6 +13,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 
 namespace PhongTro.WebApi.Controllers
@@ -23,6 +26,52 @@ namespace PhongTro.WebApi.Controllers
     {
         public UserController(IRepository repo) : base(repo) { }
 
+        /// <summary>
+        /// Callback method when login using Google authentication
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet]
+        [Route("googlecallback")]
+        public IHttpActionResult GoogleCallback()
+        {
+            var autheticationManager = HttpContext.Current.GetOwinContext().Authentication;
+            
+            //get access token to use in profile image request
+            var accessToken = autheticationManager.User.Claims.Where(c => c.Type.Equals("urn:google:accesstoken")).Select(c => c.Value).FirstOrDefault();
+            Uri apiRequestUri = new Uri("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + accessToken);
+
+            //request profile image
+            var webClient = new System.Net.WebClient();
+            var userData = webClient.DownloadString(apiRequestUri);
+
+            return Ok(userData);
+        }
+
+        /// <summary>
+        /// Login with Google account
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("google")]
+        public IHttpActionResult ExternalLogin()
+        {
+            return new ChallengeResult("Google", "http://localhost:51124/api/users/googlecallback", this.Request);
+        }
+
+        /// <summary>
+        /// Log out the website when loging in using social account
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet]
+        [Route("logout")]
+        public IHttpActionResult Logout()
+        {
+            var autheticationManager = HttpContext.Current.GetOwinContext().Authentication;
+            autheticationManager.SignOut();
+            return Ok();
+        }
 
         /// <summary>
         /// Get all users
@@ -36,6 +85,32 @@ namespace PhongTro.WebApi.Controllers
         public IHttpActionResult GetUsers()
         {
             return Ok(_Repository.GetAllUsers());
+        }
+
+        /// <summary>
+        /// Get user's data when successfully logging in
+        /// </summary>
+        /// <returns>User's data in form of a UserDTO</returns>
+        [Authorize]
+        [Route("info")]
+        public async Task<IHttpActionResult> GetUsersInfo()
+        {
+            if (User.Identity.AuthenticationType == DefaultAuthenticationTypes.ExternalCookie) // using social authentication
+            {
+                return Ok(User.Identity.Name);
+            }
+            else // using JWT authentication
+            {
+                string username = User.Identity.Name;
+                var user = await _Repository.FindUserByUserName(username);
+
+                if (user != null)
+                {
+                    return Ok(user);
+                }
+
+                return NotFound();
+            }
         }
 
         /// <summary>

@@ -21,5 +21,6 @@ namespace PhongTro.Model.DTOs
         public float TotalPoint { get; set; }
         public float NumberReviewers { get; set; }
         public string PhongTroUserID { get; set; }
+        public string[] Images { get; set; }
     }
 }

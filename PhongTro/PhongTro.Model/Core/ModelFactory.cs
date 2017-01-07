@@ -92,7 +92,8 @@ namespace PhongTro.Model.Core
                 LastUpdate = post.LastUpdate,
                 TotalPoint = post.TotalPoint,
                 NumberReviewers = post.NumberReviewers,
-                PhongTroUserID = post.PhongTroUserID.ToString()
+                PhongTroUserID = post.PhongTroUserID.ToString(),
+                Images = post.Images.Select(img => img.Url).ToArray()
             };
         }
 

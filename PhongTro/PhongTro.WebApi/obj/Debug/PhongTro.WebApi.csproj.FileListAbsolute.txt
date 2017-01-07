@@ -229,3 +229,5 @@ C:\Users\SonPham\Desktop\PhongTro2\PhongTro\PhongTro.WebApi\bin\Thinktecture.Ide
 C:\Users\SonPham\Desktop\PhongTro2\PhongTro\PhongTro.WebApi\obj\Debug\PhongTro.WebApi.csprojResolveAssemblyReference.cache
 C:\Users\SonPham\Desktop\PhongTro2\PhongTro\PhongTro.WebApi\obj\Debug\PhongTro.WebApi.dll
 C:\Users\SonPham\Desktop\PhongTro2\PhongTro\PhongTro.WebApi\obj\Debug\PhongTro.WebApi.pdb
+C:\Users\SonPham\Desktop\PhongTro2\PhongTro\PhongTro.WebApi\bin\Microsoft.Owin.Security.Google.dll
+C:\Users\SonPham\Desktop\PhongTro2\PhongTro\PhongTro.WebApi\bin\Microsoft.Owin.Security.Google.xml

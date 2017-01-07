@@ -177,11 +177,22 @@ namespace PhongTro.Model.Core
                     Price = model.Price,
                     NumberLodgers = model.NumberLodgers,
                     Description = model.Description,
-                    PhongTroUserID = user.Id
+                    PhongTroUserID = user.Id,
                 };
+                
                 try
                 {
                     _dbContext.Posts.Add(post);
+
+                    Array.ForEach(model.Images, img =>
+                    {
+                        _dbContext.BoardingHouseImages.Add(new BoardingHouseImage()
+                        {
+                            Post = post,
+                            Url = img
+                        });
+                    });
+                    
                     _dbContext.SaveChanges();
 
                     return _modelFactory.ConvertToPostDTO(post);

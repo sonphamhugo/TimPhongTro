@@ -1,10 +1,13 @@
 ﻿using Autofac;
 using Autofac.Integration.WebApi;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.DataHandler.Encoder;
+using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.Jwt;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
@@ -19,6 +22,8 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Reflection;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 
@@ -103,6 +108,37 @@ namespace PhongTro.WebApi
         /// <param name="app">Param will be supplied by the host at run-time</param>
         private void ConfigureOAuthTokenGeneration(IAppBuilder app)
         {
+            // Enable the application to use a cookie to store information for the signed in user
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationType = DefaultAuthenticationTypes.ExternalCookie
+            });
+
+            // Use a cookie to temporarily store information about a user logging in with a third party login provider
+            app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
+
+            // Configure google authentication
+            var options = new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "1090533021318-qfqn56haohr4kg1hlarfs9pefn38eap5.apps.googleusercontent.com",
+                ClientSecret = "FrGp8HEMbkRhC1-vL1Gn9ja5",
+                Provider = new GoogleOAuth2AuthenticationProvider()
+                {
+                    OnAuthenticated = (context) =>
+                    {
+                        context.Identity.AddClaim(new Claim("urn:google:name", context.Identity.FindFirstValue(ClaimTypes.Name)));
+                        context.Identity.AddClaim(new Claim("urn:google:email", context.Identity.FindFirstValue(ClaimTypes.Email)));
+
+                        //This following line is need to retrieve the profile image
+                        context.Identity.AddClaim(new Claim("urn:google:accesstoken", context.AccessToken, ClaimValueTypes.String, "Google"));
+
+                        return Task.FromResult(0);
+                    }
+                }
+            };
+
+            app.UseGoogleAuthentication(options);
+
             //Configure the db context and user manager to use a single instance per request
             app.CreatePerOwinContext(PhongTroDbContext.Create);
             app.CreatePerOwinContext<PhongTroUserManager>(PhongTroUserManager.Create);

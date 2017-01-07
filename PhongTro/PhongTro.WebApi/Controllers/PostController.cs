@@ -22,7 +22,7 @@ namespace PhongTro.WebApi.Controllers
         /// Action get all post from database
         /// </summary>
         /// <returns>IHttpResult with list of PostDTO objetcs </returns>
-        [AllowAnonymous]
+        [Authorize]
         [Route("")]
         public IHttpActionResult GetAllPosts()
         {
