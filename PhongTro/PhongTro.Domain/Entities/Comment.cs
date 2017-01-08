@@ -15,7 +15,7 @@ namespace PhongTro.Domain.Entities
         [Required]
         [MaxLength(500)]
         public string Content { get; set; }
-
+        
         public DateTime DateComment { get; set; }
         public Guid PostID { get; set; }
         public string PhongTroUserID { get; set; }

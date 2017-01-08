@@ -130,6 +130,14 @@ namespace PhongTro.Model.Core
         IEnumerable<PostDTO> GetAllPosts();
 
         /// <summary>
+        /// Get posts with paging
+        /// </summary>
+        /// <param name="pageIndex">Index of the page (from 0)</param>
+        /// <param name="pageSize">Number of posts for each page</param>
+        /// <returns>PostDTO list</returns>
+        IEnumerable<PostDTO> GetPosts(int pageIndex, int pageSize);
+
+        /// <summary>
         /// Get a post by searching its id
         /// </summary>
         /// <param name="id">The identifier of the post to be searched</param>
@@ -149,6 +157,13 @@ namespace PhongTro.Model.Core
         /// <param name="id">Identifier of user</param>
         /// <returns>List of PostDTO object</returns>
         IEnumerable<PostDTO> GetPostsByUser(string id);
+
+        /// <summary>
+        /// Get posts belong to a user with paging
+        /// </summary>
+        /// <param name="id">Identifier of user</param>
+        /// <returns>List of PostDTO object</returns>
+        IEnumerable<PostDTO> GetPostsByUser(string id, int pageIndex, int pageSize);
 
         /// <summary>
         /// Get all posts owned by a user
@@ -181,6 +196,15 @@ namespace PhongTro.Model.Core
         IEnumerable<PostDTO> GetFavouritePostsByUser(string id);
 
         /// <summary>
+        /// Get favourite posts with paging
+        /// </summary>
+        /// <param name="id">User identifier</param>
+        /// <param name="pageIndex">Index of the page (from 0)</param>
+        /// <param name="pageSize">Number of posts for each page</param>
+        /// <returns>PostDTO list</returns>
+        IEnumerable<PostDTO> GetFavouritePosts(string id, int pageIndex, int pageSize);
+
+        /// <summary>
         /// Add a post to user's favourite list
         /// </summary>
         /// <param name="userId">Identifier of the user</param>
@@ -208,6 +232,14 @@ namespace PhongTro.Model.Core
         /// <param name="postId">Identifer of the post</param>
         /// <returns></returns>
         IEnumerable<CommentDTO> GetAllCommentsByPost(string postId);
+
+        /// <summary>
+        /// Get comments with paging
+        /// </summary>
+        /// <param name="pageIndex">Index of the page (from 0)</param>
+        /// <param name="pageSize">Number of posts for each page</param>
+        /// <returns>CommentDTO list</returns>
+        IEnumerable<CommentDTO> GetComments(string postId, int pageIndex, int pageSize);
 
         /// <summary>
         /// Add a comment to a post

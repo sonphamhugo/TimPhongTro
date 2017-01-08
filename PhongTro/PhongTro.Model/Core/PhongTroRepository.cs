@@ -157,6 +157,21 @@ namespace PhongTro.Model.Core
             return _dbContext.Posts.ToList().Select(p => _modelFactory.ConvertToPostDTO(p));
         }
 
+        public IEnumerable<PostDTO> GetPosts(int pageIndex, int pageSize)
+        {
+            var posts = _dbContext.Posts.OrderBy(p => p.PostDate).Skip(pageIndex * pageSize);
+            if (posts.Count() > 0)
+            {
+                var results = posts.Take(pageSize).ToList().Select(p => _modelFactory.ConvertToPostDTO(p));
+
+                return results;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public async Task<PostDTO> GetPostById(string id)
         {
             var post = await _dbContext.Posts.FirstOrDefaultAsync(p => p.PostID.ToString() == id);
@@ -188,6 +203,7 @@ namespace PhongTro.Model.Core
                     {
                         _dbContext.BoardingHouseImages.Add(new BoardingHouseImage()
                         {
+                            BoardingHouseImageID = Guid.NewGuid(),
                             Post = post,
                             Url = img
                         });
@@ -213,6 +229,25 @@ namespace PhongTro.Model.Core
                 .Where(p => p.PhongTroUserID == id)
                 .ToList()
                 .Select(p => _modelFactory.ConvertToPostDTO(p));
+        }
+
+        public IEnumerable<PostDTO> GetPostsByUser(string id, int pageIndex, int pageSize)
+        {
+            var posts = _dbContext.Posts
+                        .Where(p => p.PhongTroUserID == id)
+                        .OrderBy(p => p.PostID)
+                        .Skip(pageIndex * pageSize);
+
+            if (posts.Count() > 0)
+            {
+                var results = posts.Take(pageSize).ToList().Select(p => _modelFactory.ConvertToPostDTO(p));
+
+                return results;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public async Task<PostDTO> UpdatePost(string postId, CreatingPostDTO model)
@@ -281,6 +316,26 @@ namespace PhongTro.Model.Core
                             .Where(p => p.PhongTroUserID.ToString() == id)
                             .ToList()
                             .Select(p => _modelFactory.ConvertToPostDTO(p.Post));
+        }
+
+        public IEnumerable<PostDTO> GetFavouritePosts(string id, int pageIndex, int pageSize)
+        {
+            var favs = _dbContext.FavouritePosts
+                            .Include(p => p.Post)
+                            .Where(p => p.PhongTroUserID.ToString() == id)
+                            .OrderBy(p => p.PostID)
+                            .Skip(pageIndex * pageSize);
+
+            if (favs.Count() > 0)
+            {
+                var results = favs.Take(pageSize).ToList().Select(p => _modelFactory.ConvertToPostDTO(p.Post));
+
+                return results;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public async Task<bool> AddFavouritePost(string userId, string postId)
@@ -388,6 +443,27 @@ namespace PhongTro.Model.Core
                 .Where(c => c.PostID.ToString() == postId)
                 .ToList()
                 .Select(c => _modelFactory.ConvertToCommentDTO(c));
+        }
+
+        public IEnumerable<CommentDTO> GetComments(string postId, int pageIndex, int pageSize)
+        {
+         
+            var comments = _dbContext.Comments
+                .Include(c => c.PhongTroUser)
+                .Where(c => c.PostID.ToString() == postId)
+                .OrderBy(c => c.DateComment)
+                .Skip(pageIndex * pageSize);
+
+            if (comments.Count() > 0)
+            {
+                var results = comments.Take(pageSize).ToList().Select(c => _modelFactory.ConvertToCommentDTO(c));
+
+                return results;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public async Task<bool> CheckCommentOwner(string userId, string commentId)

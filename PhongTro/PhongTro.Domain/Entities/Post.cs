@@ -46,7 +46,6 @@ namespace PhongTro.Domain.Entities
             LastUpdate = DateTime.Now;
             TotalPoint = 0;
             NumberReviewers = 0;
-
         }
     }
 }

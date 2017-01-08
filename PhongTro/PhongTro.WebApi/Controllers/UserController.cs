@@ -1,17 +1,22 @@
 ﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PhongTro.Domain.Entities;
 using PhongTro.Domain.Infracstucture;
 using PhongTro.Model;
 using PhongTro.Model.Core;
 using PhongTro.Model.DTOs;
+using PhongTro.WebApi.Providers;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -24,6 +29,12 @@ namespace PhongTro.WebApi.Controllers
     [RoutePrefix("api/users")]
     public class UserController : BaseApiController
     {
+        #region Constants
+        const string GoogleTokenType = "urn:google:accesstoken";
+        const string GoolgeProfileUri = "https://www.googleapis.com/oauth2/v2/userinfo?access_token=";
+        const string GoogleCallbackUri = "/api/users/googlecallback";
+        #endregion
+
         public UserController(IRepository repo) : base(repo) { }
 
         /// <summary>
@@ -33,19 +44,33 @@ namespace PhongTro.WebApi.Controllers
         [Authorize]
         [HttpGet]
         [Route("googlecallback")]
-        public IHttpActionResult GoogleCallback()
+        public async Task<IHttpActionResult> GoogleCallback()
         {
             var autheticationManager = HttpContext.Current.GetOwinContext().Authentication;
-            
+
             //get access token to use in profile image request
-            var accessToken = autheticationManager.User.Claims.Where(c => c.Type.Equals("urn:google:accesstoken")).Select(c => c.Value).FirstOrDefault();
-            Uri apiRequestUri = new Uri("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + accessToken);
+            var accessToken = autheticationManager.User.Claims.Where(c => c.Type.Equals(GoogleTokenType)).Select(c => c.Value).FirstOrDefault();
+            Uri apiRequestUri = new Uri(GoolgeProfileUri + accessToken);
 
             //request profile image
             var webClient = new System.Net.WebClient();
             var userData = webClient.DownloadString(apiRequestUri);
+            dynamic result = JsonConvert.DeserializeObject(userData);
+            var userEmail = result.email;
 
-            return Ok(userData);
+            // find user who registered with this email
+            var userManager = HttpContext.Current.GetOwinContext().GetUserManager<PhongTroUserManager>();
+            PhongTroUser user = await userManager.FindByNameAsync(Convert.ToString(userEmail));
+
+            if (null != user) // if this Google account has been register to PhongTro
+            {
+                var response = await GenerateLocalAccessToken(user);
+                return Ok(response);
+            }
+            else // return Google profile for registering new account
+            {
+                return Ok(userData);
+            }
         }
 
         /// <summary>
@@ -56,7 +81,7 @@ namespace PhongTro.WebApi.Controllers
         [Route("google")]
         public IHttpActionResult ExternalLogin()
         {
-            return new ChallengeResult("Google", "http://localhost:51124/api/users/googlecallback", this.Request);
+            return new ChallengeResult("Google", GoogleCallbackUri, this.Request);
         }
 
         /// <summary>
@@ -95,22 +120,15 @@ namespace PhongTro.WebApi.Controllers
         [Route("info")]
         public async Task<IHttpActionResult> GetUsersInfo()
         {
-            if (User.Identity.AuthenticationType == DefaultAuthenticationTypes.ExternalCookie) // using social authentication
-            {
-                return Ok(User.Identity.Name);
-            }
-            else // using JWT authentication
-            {
-                string username = User.Identity.Name;
-                var user = await _Repository.FindUserByUserName(username);
+            string username = User.Identity.Name;
+            var user = await _Repository.FindUserByUserName(username);
 
-                if (user != null)
-                {
-                    return Ok(user);
-                }
-
-                return NotFound();
+            if (user != null)
+            {
+                return Ok(user);
             }
+
+            return NotFound();
         }
 
         /// <summary>

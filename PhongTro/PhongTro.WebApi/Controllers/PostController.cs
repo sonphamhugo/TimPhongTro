@@ -22,11 +22,20 @@ namespace PhongTro.WebApi.Controllers
         /// Action get all post from database
         /// </summary>
         /// <returns>IHttpResult with list of PostDTO objetcs </returns>
-        [Authorize]
+        [AllowAnonymous]
         [Route("")]
         public IHttpActionResult GetAllPosts()
         {
             var posts = _Repository.GetAllPosts();
+
+            return Ok(posts);
+        }
+
+        [AllowAnonymous]
+        [Route("{pageIndex:int}/{pageSize:int}")]
+        public IHttpActionResult GetPosts(int PageIndex, int PageSize)
+        {
+            var posts = _Repository.GetPosts(PageIndex, PageSize);
 
             return Ok(posts);
         }
@@ -67,6 +76,28 @@ namespace PhongTro.WebApi.Controllers
             }
 
             var comments = _Repository.GetAllCommentsByPost(PostId);
+
+            return Ok(comments);
+
+        }
+
+        /// <summary>
+        /// Get comments with paging
+        /// </summary>
+        /// <param name="PostId"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [Route("{postId:guid}/comments/{pageIndex:int}/{pageSize:int}")]
+        public async Task<IHttpActionResult> GetCommentsByPost(string PostId, int PageIndex, int PageSize)
+        {
+            var post = await _Repository.GetPostById(PostId);
+
+            if (null == post)
+            {
+                return NotFound();
+            }
+
+            var comments = _Repository.GetComments(PostId, PageIndex, PageSize);
 
             return Ok(comments);
 
@@ -171,6 +202,20 @@ namespace PhongTro.WebApi.Controllers
         {
             var id = User.Identity.GetUserId();
             var posts = _Repository.GetPostsByUser(id);
+
+            return Ok(posts);
+        }
+
+        /// <summary>
+        /// Get all posts owned by a user
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Roles = "Landlord")]
+        [Route("ownposts/{pageIndex:int}/{pageSize:int}")]
+        public IHttpActionResult GetPostByUser(int PageIndex, int PageSize)
+        {
+            var id = User.Identity.GetUserId();
+            var posts = _Repository.GetPostsByUser(id, PageIndex, PageSize);
 
             return Ok(posts);
         }

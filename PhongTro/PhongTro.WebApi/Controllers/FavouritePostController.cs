@@ -32,6 +32,20 @@ namespace PhongTro.WebApi.Controllers
         }
 
         /// <summary>
+        /// Get favourite posts with paging
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Roles = "Lodger")]
+        [Route("{pageIndex:int}/{pageSize:int}")]
+        public IHttpActionResult GetFavouritePosts(int PageIndex, int PageSize)
+        {
+            var id = User.Identity.GetUserId();
+            var posts = _Repository.GetFavouritePosts(id, PageIndex, PageSize);
+
+            return Ok(posts);
+        }
+
+        /// <summary>
         /// Add a post to user's favourite list
         /// </summary>
         /// <param name="postId">Identifier of the post</param>

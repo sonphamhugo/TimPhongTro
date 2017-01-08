@@ -35,11 +35,18 @@ namespace PhongTro.WebApi
     public class Startup
     {
         #region Constants
+        const string AppName = "PhongTro";
         const string KeyAudienceID = "as:AudienceId";
         const string KeyAudienceSecret = "as:AudienceSecret";
         const string KeyTokenIssuer = "tokenIssuer";
         const string KeyTokenGenPath = "tokenGenPath";
         const int TokenExpireTime = 1;
+        const string KeyGoogleClientId = "GoogleClientId";
+        const string KeyGoogleClientSecret = "GoogleClientSecret";
+        const string KeyClaimGoogleName = "urn:google:name";
+        const string KeyClaimGoogleEmail = "urn:google:email";
+        const string KeyGoogleAccessToken = "urn:google:accesstoken";
+        const string GoogleTokenIssuer = "Google";
         #endregion
 
         /// <summary>
@@ -82,12 +89,12 @@ namespace PhongTro.WebApi
             builder.RegisterType<PhongTroUserManager>().AsSelf();
             builder.Register(c => new IdentityFactoryOptions<PhongTroUserManager>
             {
-                DataProtectionProvider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider("PhongTro​")
+                DataProtectionProvider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider(AppName)
             });
             builder.Register(c => new RoleStore<IdentityRole>(c.Resolve<PhongTroDbContext>())).AsImplementedInterfaces();
             builder.Register(c => new IdentityFactoryOptions<PhongTroRoleManager>
             {
-                DataProtectionProvider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider("PhongTro​")
+                DataProtectionProvider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider(AppName)
             });
             builder.RegisterType<PhongTroRoleManager>().AsSelf();
 
@@ -120,17 +127,17 @@ namespace PhongTro.WebApi
             // Configure google authentication
             var options = new GoogleOAuth2AuthenticationOptions()
             {
-                ClientId = "1090533021318-qfqn56haohr4kg1hlarfs9pefn38eap5.apps.googleusercontent.com",
-                ClientSecret = "FrGp8HEMbkRhC1-vL1Gn9ja5",
+                ClientId = ConfigurationManager.AppSettings[KeyGoogleClientId],
+                ClientSecret = ConfigurationManager.AppSettings[KeyGoogleClientSecret],
                 Provider = new GoogleOAuth2AuthenticationProvider()
                 {
                     OnAuthenticated = (context) =>
                     {
-                        context.Identity.AddClaim(new Claim("urn:google:name", context.Identity.FindFirstValue(ClaimTypes.Name)));
-                        context.Identity.AddClaim(new Claim("urn:google:email", context.Identity.FindFirstValue(ClaimTypes.Email)));
+                        context.Identity.AddClaim(new Claim(KeyClaimGoogleName, context.Identity.FindFirstValue(ClaimTypes.Name)));
+                        context.Identity.AddClaim(new Claim(KeyClaimGoogleEmail, context.Identity.FindFirstValue(ClaimTypes.Email)));
 
                         //This following line is need to retrieve the profile image
-                        context.Identity.AddClaim(new Claim("urn:google:accesstoken", context.AccessToken, ClaimValueTypes.String, "Google"));
+                        context.Identity.AddClaim(new Claim(KeyGoogleAccessToken, context.AccessToken, ClaimValueTypes.String, GoogleTokenIssuer));
 
                         return Task.FromResult(0);
                     }
@@ -156,7 +163,7 @@ namespace PhongTro.WebApi
                 // config to use the custom Jwt format
                 AccessTokenFormat = new CustomJwtFormat(ConfigurationManager.AppSettings[KeyTokenIssuer]) 
             };
-
+            
             // OAuth 2.0 Bearer Access Token Generation
             app.UseOAuthAuthorizationServer(OAuthServerOptions);
         }
